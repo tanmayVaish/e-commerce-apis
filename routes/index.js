@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
+const jwt = require("jsonwebtoken");
 
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
@@ -40,12 +41,39 @@ router.post("/register", async function (req, res) {
   }
 });
 
-router.get("/login", function (req, res) {
-  res.send("Login");
+router.post("/login", async function (req, res) {
+  const { email, password } = req?.body;
+
+  const user = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+  });
+
+  if (!user) res.status(400).json({ message: "User does not exist" });
+
+  const match = await bcrypt.compare(password, user.password);
+
+  if (!match) res.status(400).json({ message: "Password is incorrect" });
+
+  // create JWT token
+  const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+    expiresIn: "1h",
+  });
+
+  console.log(token);
+
+  if (!token) res.status(400).json({ message: "Token could not be created" });
+
+  // set token in cookie
+  res.cookie("jwt", token);
+
+  res.status(200).json({ message: "User logged in successfully" });
 });
 
-router.get("/logout", function (req, res) {
-  res.send("Logout");
+router.post("/logout", function (req, res) {
+  res.clearCookie("jwt");
+  res.status(200).json({ message: "User logged out successfully" });
 });
 
 module.exports = router;
