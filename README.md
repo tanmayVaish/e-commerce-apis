@@ -5,7 +5,7 @@
 ### Run the server
 
 ```bash
-yarn dev
+yarn start
 ```
 
 ### Run the server (dev)
