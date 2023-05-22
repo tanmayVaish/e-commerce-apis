@@ -9,6 +9,8 @@ var usersRouter = require("./routes/user");
 
 var app = express();
 
+const isAuthenticated = require("./middlewares/isAuthenticated");
+
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -16,6 +18,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
-app.use("/user", usersRouter);
+app.use("/user", isAuthenticated, usersRouter);
 
 module.exports = app;
