@@ -8,7 +8,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 // create Register, Login, Logout routes
-router.post("/register", async function (req, res) {
+router.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req?.body;
 
