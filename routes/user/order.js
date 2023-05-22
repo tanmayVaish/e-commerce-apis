@@ -10,9 +10,8 @@ router.post("/create", async function (req, res) {
 
   if (!status || !totalCost || !customerId || !products) {
     res.status(400).json({ message: "Invalid request body" });
+    return;
   }
-
-  console.log("products", typeof products);
 
   try {
     const allVariants = await prisma.variant.findMany({
@@ -23,29 +22,53 @@ router.post("/create", async function (req, res) {
       },
     });
 
-    const newOrder = await prisma.order.create({
-      data: {
-        status,
-        totalCost,
-        customer: {
-          connect: {
-            id: customerId,
-          },
-        },
-        products: {
-          connect: allVariants.map((variant) => {
-            return {
-              id: variant.id,
-            };
-          }),
-        },
-      },
-    });
-
-    if (!newOrder) {
-      res.status(400).json({ message: "Order could not be created" });
+    if (allVariants.length !== products.length) {
+      res.status(400).json({ message: "Invalid product" });
+      return;
     }
 
+    if (allVariants.some((variant) => variant.stock <= 0)) {
+      res.status(400).json({ message: "Product out of stock" });
+      return;
+    }
+
+    const [newOrder, updatedVariants] = await prisma.$transaction([
+      prisma.order.create({
+        data: {
+          status,
+          totalCost,
+          customer: {
+            connect: {
+              id: customerId,
+            },
+          },
+          products: {
+            connect: allVariants.map((variant) => {
+              return {
+                id: variant.id,
+              };
+            }),
+          },
+        },
+      }),
+      prisma.variant.updateMany({
+        where: {
+          id: {
+            in: products,
+          },
+        },
+        data: {
+          stock: {
+            decrement: 1,
+          },
+        },
+      }),
+    ]);
+
+    if (!newOrder || !updatedVariants) {
+      res.status(400).json({ message: "Order could not be created" });
+      return;
+    }
     res.status(200).json({ message: "Order created successfully", newOrder });
   } catch (error) {
     res.status(500).json(error.message);
@@ -54,8 +77,6 @@ router.post("/create", async function (req, res) {
 
 router.get("/get/:id", async function (req, res) {
   const { id } = req?.params;
-
-  console.log(parseInt(id));
 
   try {
     const order = await prisma.order.findMany({
