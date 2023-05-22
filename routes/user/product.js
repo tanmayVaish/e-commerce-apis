@@ -75,8 +75,19 @@ router.patch("/update/:id", async function (req, res) {
 });
 
 router.get("/all", async function (req, res) {
+  const { name, description, variantName } = req.query;
+
+  console.log(name, description, variantName);
+
   try {
     const products = await prisma.product.findMany({
+      where: {
+        AND: [
+          { name: { contains: name || "" } },
+          { description: { contains: description || "" } },
+          { variant: { some: { name: { contains: variantName || "" } } } },
+        ],
+      },
       include: {
         variant: true,
       },
