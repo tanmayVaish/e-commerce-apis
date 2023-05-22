@@ -18,6 +18,8 @@ yarn dev
 
 > **IMPORTANT**: **--->** Please use `Prod` environment in Postman to test the APIs. **<---**
 
+> **POSTMAN LINK**: https://elements.getpostman.com/redirect?entityId=26690439-a3d8ae62-5c8b-4b58-b59e-398bb8be16e2&entityType=collection
+
 ### Public
 
 * Register a new user [POST `/register`]
