@@ -4,8 +4,6 @@ const isAuthenticated = (req, res, next) => {
   // Get the JWT token from the cookie
   const token = req.cookies.jwt;
 
-  console.log(token);
-
   // Check if the token exists
   if (!token) {
     return res

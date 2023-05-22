@@ -61,8 +61,6 @@ router.post("/login", async function (req, res) {
     expiresIn: "1h",
   });
 
-  console.log(token);
-
   if (!token) res.status(400).json({ message: "Token could not be created" });
 
   // set token in cookie
