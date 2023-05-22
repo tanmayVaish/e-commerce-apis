@@ -14,6 +14,90 @@ yarn start
 yarn dev
 ```
 
+## APIs
+
+> **IMPORTANT**: **--->** Please use `Prod` environment in Postman to test the APIs. **<---**
+
+### Public
+
+* Register a new user [POST `/register`]
+
+    ```json
+    {
+      "name": "John Doe",
+      "email": "john.doe@foo.com",
+      "password": "password"
+    }
+    ```
+* Login [POST `/login`]
+
+    ```json
+    {
+      "email": "john.doe@foo.com",
+      "password": "password"
+    }
+    ```
+* Logout [POST `/logout`]
+
+### User [Authenticated (Accessible after Login) `/user`]
+
+#### Product
+
+* Create a new product [POST `/product/create`]
+
+    ```json
+    {
+      "name" : "H&M T-Shirt",
+      "description": "T-Shirt Cotton",
+      "price" : 200,
+      "userId" : 1,
+      "variant" : [
+        {
+          "name" : "Green",
+          "sku" : "AB123",
+          "additionalCost": 0,
+          "stock": 2
+        },
+        {
+          "name" : "Red",
+          "sku" : "AB124",
+          "additionalCost": 10,
+          "stock": 1
+        }
+      ]
+    }
+    ```
+* Get all products [GET `/product/all`]
+
+  Query Parameters:
+
+    * `name` - Search by name
+    * `description` - Search by description
+    * 'variationName' - Search by variation name
+
+* Update a product [PUT `/product/update/:id`]
+
+    ```json
+    {
+      "description": "T-Shirt Cotton 100%"
+    }
+    ```
+* Delete a product [DELETE `/product/delete/:id`]
+
+#### Order
+
+* Create a new order [POST `/order/create`]
+
+    ```json
+  {
+      "status": "order placed",
+      "totalCost": 500, // could be calculated on the frontend!
+      "customerId": 1,
+      "products": [6]
+  }
+  ```
+* Get all order by customer [GET `/order/all/:id`]
+
 ## How to Run in Production
 
 * Server is hosted on Railway (https://e-commerce-apis-production.up.railway.app/)
